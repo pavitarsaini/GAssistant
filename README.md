@@ -18,7 +18,7 @@ User Interface : TODO
 
     Design : 1/2
     
-    Programming ; TODO
+    Programming : TODO
     
 ## Installation
 
