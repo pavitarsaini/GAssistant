@@ -11,7 +11,15 @@ Pushbullet Tests : Ongoing
     Stream Connection : Ongoing 
   
     Initial Data Load : TODO 
+    
+Connect Services : TODO
 
+User Interface : TODO
+
+    Design : 1/2
+    
+    Programming ; TODO
+    
 ## Installation
 
 
