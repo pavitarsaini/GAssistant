@@ -29,3 +29,6 @@ npm install google-assistant
 
 ## Usage
 
+# Thanks To
+
+Firebase Webhook (IFTTT) -> MQTT bridge
