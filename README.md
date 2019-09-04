@@ -23,5 +23,3 @@ User Interface : TODO
 ## Usage
 
 # Thanks To
-
-Firebase Webhook (IFTTT) -> MQTT bridge
