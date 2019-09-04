@@ -20,13 +20,6 @@ User Interface : TODO
     
     Programming : TODO
     
-## Installation
-
-
-```bash
-npm install google-assistant
-```
-
 ## Usage
 
 # Thanks To
