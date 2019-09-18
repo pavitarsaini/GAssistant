@@ -21,5 +21,3 @@ User Interface : TODO
     Programming : TODO
     
 ## Usage
-
-# Thanks To
