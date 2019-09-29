@@ -1,8 +1,10 @@
-./GA-node-test/node_modules
-./GA-python-test/node_modules
-./GA-ui-test/node_modules
-./pushbullet-node-test/node_modules
+node_modules
 
-./GA-node-test/examples/*.json
-./GA-ui-test/examples/*.json
-./pushbullet-node-test/.env
+./tests/GA-node-test/node_modules
+./tests/GA-python-test/node_modules
+./tests/GA-ui-test/node_modules
+./tests/pushbullet-node-test/node_modules
+
+./tests/GA-node-test/examples/*.json
+./tests/GA-ui-test/examples/*.json
+./tests/pushbullet-node-test/.env
