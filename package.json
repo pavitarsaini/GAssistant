@@ -2,7 +2,7 @@
   "name": "google-assistant",
   "version": "0.0.1",
   "description": "WIN 10 Google Assistant",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
     "start": "electron ."
   },

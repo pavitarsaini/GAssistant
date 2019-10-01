@@ -1,8 +1,7 @@
 node_modules
 
-./tests/GA-node-test/examples/*.json
-./tests/GA-ui-test/examples/*.json
-./tests/pushbullet-node-test/.env
+*.json
+*.env
 
 app/tokens.json
 app/client_id.json
