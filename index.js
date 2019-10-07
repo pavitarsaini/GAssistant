@@ -12,7 +12,8 @@ function createWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'app/loaders/preload.js')
+      preload: path.join(__dirname, 'app/loaders/preload.js'),
+      nodeIntegration: true
     }
   })
 
@@ -20,7 +21,7 @@ function createWindow () {
   mainWindow.loadFile('./app/index.html')
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -35,7 +36,6 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
-
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar

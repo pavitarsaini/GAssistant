@@ -1,11 +1,19 @@
 'use strict';
 
+const fs = require('fs')
+const path = require('path')
+
 const record = require('node-record-lpcm16');
 const Speaker = require('speaker');
-const path = require('path');
-const GoogleAssistant = require('../node_modules/google-assistant/index');
-const speakerHelper = require('../node_modules/google-assistant/examples/speaker-helper');
-var fs = require('fs');
+const GoogleAssistant = require('google-assistant/index');
+const speakerHelper = require('google-assistant/examples/speaker-helper');
+const replace = require('replace-in-file');
+
+const options = {
+  files: './app/data.html',
+  from: '<img class="in4M3QLgQj6__icon" src="https://www.gstatic.com/actions/devices_platform/assistant_tv_logo.svg">',
+  to: '',
+};
 
 const config = {
   auth: {
@@ -20,7 +28,7 @@ const config = {
       encodingIn: 'LINEAR16', // supported are LINEAR16 / FLAC (defaults to LINEAR16)
       sampleRateIn: 16000, // supported rates are between 16000-24000 (defaults to 16000)
       encodingOut: 'LINEAR16', // supported are LINEAR16 / MP3 / OPUS_IN_OGG (defaults to LINEAR16)
-      sampleRateOut: 24000, // supported are 16000 / 24000 (defaults to 24000)
+      sampleRateOut: 20000, // supported are 16000 / 24000 (defaults to 24000)
     },
     lang: 'en-US', // language code for input/output (defaults to en-US)
  // use if you've gone through the Device Registration process
@@ -38,6 +46,8 @@ const config = {
   },
 };
 
+// setup the assistant
+const assistant = new GoogleAssistant(config.auth);
 
 const startConversation = (conversation) => {
   console.log('Say something!');
@@ -52,9 +62,17 @@ const startConversation = (conversation) => {
     // done speaking, close the mic
     .on('end-of-utterance', () => record.stop())
     // just to spit out to the console what was said (as we say it)
-    .on('transcription', data => console.log('Transcription:', data.transcription, ' --- Done:', data.done))
+    .on('transcription', (data) => {
+      console.log('Transcription:', data.transcription, ' --- Done:', data.done)
+      
+      document.getElementById("log-container").textContent=data.transcription;
+
+    })
     // what the assistant said back
-    .on('response', text => console.log('Assistant Text Response:', text))
+    .on('response', text => {
+      console.log('Assistant Text Response:', text)
+      //document.getElementById("logger").textContent=text;
+    })
 
     // if we've requested a volume level change, get the percentage of the new level
     .on('volume-percent', percent => console.log('New Volume Percent:', percent))
@@ -67,20 +85,27 @@ const startConversation = (conversation) => {
 
       var buf = screen.data.toString();
 
-      fs.writeFile("data.html", buf, (err) => {
+      fs.writeFile("./app/data.html", buf, (err) => {
         if (err) console.log(err);
         console.log("Successfully Written to File.");
       });
 
-      //console.log('SCREEN DATA:', buf);
+      replace(options)
+      .then(results => {
+        console.log('Replacement results:', results);
+        var ifrm = document.getElementById("ifrm");
+      ifrm.setAttribute('src', "data.html");
+      })
+      .catch(error => {
+        console.error('Error occurred:', error);
+      });      
 
     })
 
     .on('ended', (error, continueConversation) => {
-      if (error) console.log('Conversation Ended Error:', error);
-      else if (continueConversation) openMicAgain = true;
-      else console.log('Conversation Complete');
-    })
+        console.log('Conversation Complete');
+        openMicAgain = true;
+      })
     // catch any errors
     .on('error', (error) => {
       console.log('Conversation Error:', error);
@@ -101,20 +126,25 @@ const startConversation = (conversation) => {
       console.log('Assistant Speaking');
       speakerHelper.open();
     })
-    .on('close', () => {
-      console.log('Assistant Finished Speaking');
-      if (openMicAgain) assistant.start(config.conversation);
+    .on('flush', () => {
+      console.log('Assistant Finished Speaking');      
+      
+      promptForInput()
     });
 };
 
-// setup the assistant
-const assistant = new GoogleAssistant(config.auth);
+
+const promptForInput = () => {
+  // type what you want to ask the assistant
+  
+  assistant.start(config.conversation, startConversation);
+  
+};
+
+
 assistant
-  .on('ready', () => {
-    // start a conversation!
-    assistant.start(config.conversation);
-  })
-  .on('started', startConversation)
+.on('ready', promptForInput)
+  //.on('started', startConversation)
   .on('error', (error) => {
     console.log('Assistant Error:', error);
   });
