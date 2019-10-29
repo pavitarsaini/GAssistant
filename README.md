@@ -1,2 +1,2 @@
-# GAssistant
-Unofficial Google Assistant For Windows 10
+# WIP GAssistant
+Unofficial Node.js Google Assistant For Windows 10
