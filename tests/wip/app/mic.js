@@ -7,13 +7,7 @@ const record = require('node-record-lpcm16');
 const Speaker = require('speaker');
 const GoogleAssistant = require('google-assistant/index');
 const speakerHelper = require('google-assistant/examples/speaker-helper');
-const replace = require('replace-in-file');
 
-const options = {
-  files: './app/data.html',
-  from: '<img class="in4M3QLgQj6__icon" src="https://www.gstatic.com/actions/devices_platform/assistant_tv_logo.svg">',
-  to: '',
-};
 
 const config = {
   auth: {
@@ -28,7 +22,7 @@ const config = {
       encodingIn: 'LINEAR16', // supported are LINEAR16 / FLAC (defaults to LINEAR16)
       sampleRateIn: 16000, // supported rates are between 16000-24000 (defaults to 16000)
       encodingOut: 'LINEAR16', // supported are LINEAR16 / MP3 / OPUS_IN_OGG (defaults to LINEAR16)
-      sampleRateOut: 20000, // supported are 16000 / 24000 (defaults to 24000)
+      sampleRateOut: 24000, // supported are 16000 / 24000 (defaults to 24000)
     },
     lang: 'en-US', // language code for input/output (defaults to en-US)
  // use if you've gone through the Device Registration process
@@ -38,7 +32,7 @@ const config = {
         longitude: -79.764255,
       },
     },
-    //textQuery: 'What is the Weather?', // if this is set, audio input is ignored
+    textQuery: 'What is the Weather?', // if this is set, audio input is ignored
     isNew: false, // set this to true if you want to force a new conversation and ignore the old state
     screen: {
       isOn: true, // set this to true if you want to output results to a screen
@@ -46,30 +40,9 @@ const config = {
   },
 };
 
-// setup the assistant
-const assistant = new GoogleAssistant(config.auth);
-let running = false;
-let endded = true;
-
-const promptForInput = () => {
-  // type what you want to ask the assistant
-  
-  assistant.start(config.conversation, startConversation);
-  
-};
-
-assistant
-.on('ready', promptForInput)
-  //.on('started', startConversation)
-  .on('error', (error) => {
-    console.log('Assistant Error:', error);
-  });
-
 const startConversation = (conversation) => {
   console.log('Say something!');
-  let openMicAgain = false;
-  running = true;
-  endded = false;
+  let openMicAgain = true;
 
   // setup the conversation
   conversation
@@ -82,15 +55,9 @@ const startConversation = (conversation) => {
     // just to spit out to the console what was said (as we say it)
     .on('transcription', (data) => {
       console.log('Transcription:', data.transcription, ' --- Done:', data.done)
-      
-      document.getElementById("log-container").textContent=data.transcription;
-
     })
     // what the assistant said back
-    .on('response', text => {
-      console.log('Assistant Text Response:', text)
-      //document.getElementById("logger").textContent=text;
-    })
+    .on('response', text => console.log('Assistant Text Response:', text))
 
     // if we've requested a volume level change, get the percentage of the new level
     .on('volume-percent', percent => console.log('New Volume Percent:', percent))
@@ -103,27 +70,20 @@ const startConversation = (conversation) => {
 
       var buf = screen.data.toString();
 
-      fs.writeFile("./app/data.html", buf, (err) => {
+      fs.writeFile("data.html", buf, (err) => {
         if (err) console.log(err);
         console.log("Successfully Written to File.");
       });
 
-      replace(options)
-      .then(results => {
-        console.log('Replacement results:', results);
-        var ifrm = document.getElementById("ifrm");
-      ifrm.setAttribute('src', "data.html");
-      })
-      .catch(error => {
-        console.error('Error occurred:', error);
-      });      
+      //console.log('SCREEN DATA:', buf);
 
     })
 
     .on('ended', (error, continueConversation) => {
-        console.log('Conversation Complete');
-        endded = true;
-      })
+      if (error) console.log('Conversation Ended Error:', error);
+      else if (continueConversation) openMicAgain = true;
+      else console.log('Conversation Complete');
+    })
     // catch any errors
     .on('error', (error) => {
       console.log('Conversation Error:', error);
@@ -144,18 +104,21 @@ const startConversation = (conversation) => {
       console.log('Assistant Speaking');
       speakerHelper.open();
     })
-    .on('flush', () => {
-      console.log('Assistant Finished Speaking');      
-      running = false;
-      promptForInput();
+    .on('close', () => {
+      console.log('Assistant Finished Speaking');
+      if (openMicAgain) assistant.start(config.conversation);
     });
 };
 
-
-
-
-
-  while (!running && endded) {
-    promptForInput();
-  }
+// setup the assistant
+const assistant = new GoogleAssistant(config.auth);
+assistant
+  .on('ready', () => {
+    // start a conversation!
+    assistant.start(config.conversation);
+  })
+  .on('started', startConversation)
+  .on('error', (error) => {
+    console.log('Assistant Error:', error);
+  });
 

@@ -15,7 +15,7 @@ const config = {
   },
   conversation: {
     audio: {
-      sampleRateOut: 24000, // defaults to 24000
+      sampleRateOut: 20000, // defaults to 24000
     },
     lang: 'en-US', // defaults to en-US, but try other ones, it's fun!
   },
