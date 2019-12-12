@@ -158,4 +158,3 @@ const startConversation = (conversation) => {
   while (!running && endded) {
     promptForInput();
   }
-
